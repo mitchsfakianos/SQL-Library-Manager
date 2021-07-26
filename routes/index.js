@@ -12,6 +12,8 @@ router.get('/books', (req, res) => {
 	    console.error('Error connecting to the database: ', error);
 	  }
 	})();
+
+	res.render('index');
 });
 
 module.exports = router;
