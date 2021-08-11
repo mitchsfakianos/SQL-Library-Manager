@@ -7,7 +7,9 @@ router.get('/books/new', (req, res, next) => {
 });
 
 router.post('/books/new', (req, res) => {
-
+	console.log('posted');
+	Book.create(req.body)
+		.then( function() {res.redirect('/')})
 });
 
 router.get('/books/:id', (req, res, next) => {
