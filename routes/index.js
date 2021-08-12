@@ -2,6 +2,16 @@ var express = require('express');
 var router = express.Router();
 const Book = require('../models').Book;
 
+function asyncHandler(cb) {
+    return async(req, res, next) => {
+        try {
+            await cb(req, res, next);
+        } catch (error) {
+            next(error);
+        };
+    };
+};
+
 // getting new book form
 router.get('/books/new', (req, res, next) => {
 	res.render('new-book', { book: Book.build()});
@@ -39,21 +49,27 @@ router.post('/books/:id', (req, res) => {
 				res.render('page-not-found');
 			}})
 		.catch( function(err) {
+			var book = Book.build(req.body);
+			book.id = req.params.id;
 			res.render('update-book', {book: book, errors: err.errors})		
 		})
 });
 
 // deleting book
-router.post('/books/:id/delete', (req, res) => {
-	Book.findByPk(req.params.id)
-		.then( function(book) {return book.destroy();})
-		.then( function() {res.redirect('/books')})
-});
+router.post('/books/:id/delete', asyncHandler(async(req, res) => {
+	const book = await Book.findByPk(req.params.id);
+
+	if(book) {
+		await book.destroy();
+		res.redirect('/');
+	} else {
+		res.render('page-not-found');
+	}
+}));
 
 router.get('/books', (req, res) => {
 	Book.findAll().then( function(books) {
-		var list = { books: books };
-		res.render('index', list);
+		res.render('index', { books: books });
 	});
 });
 
