@@ -27,12 +27,9 @@ app.use((req, res) => { // 404 handler
 	res.render('page-not-found');
 });
 
-/*app.use(function (err, req, res, next){   // general error handler
-	res.locals.error = err;
-	res.status(err.status);
-	if (err.status != 404) {  // this handler still caught 404s, so this stops there from being two logs for the same error
-		err.message = "Something went wrong!"
-		console.log(err.status, err.message);
-		res.render('error');
-	}
-});*/
+app.use(function (err, req, res, next){   // general error handler
+	res.status(err.status || 500);
+	err.message = "Something went wrong!"
+	console.log(err.status, err.message);
+	res.render('error');
+});
