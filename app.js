@@ -24,12 +24,16 @@ app.get('/', (req, res) => {
 });
 
 app.use((req, res) => { // 404 handler
+	console.log('404 handler called');
 	res.render('page-not-found');
 });
 
 app.use(function (err, req, res, next){   // general error handler
-	res.status(err.status || 500);
-	err.message = "Something went wrong!"
-	console.log(err.status, err.message);
-	res.render('error');
+	if(err.status === 404) {
+		console.log('404 handler called');
+		res.render('page-not-found');
+	} else {
+		console.log('global error handler called');
+		res.render('error');
+	}
 });

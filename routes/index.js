@@ -27,27 +27,17 @@ router.post('/books/new', (req, res) => {
 });
 
 // getting each book by id, if id book is not present, not found is shown
-router.get('/books/:id', (req, res, next) => {
-	Book.findByPk(req.params.id)
-		.then( function(book) {
-			if(book) {
-				res.render('update-book', {book: book, title: book.title})
-			} else {
-				res.render('page-not-found');
-			}
-		})
-});
+router.get('/books/:id', asyncHandler(async(req, res, next) => {
+	const book = await Book.findByPk(req.params.id)
+		
+	await res.render('update-book', {book: book, title: book.title})
+}));
 
 // updating book and catching errors
 router.post('/books/:id', (req, res) => {
 	Book.findByPk(req.params.id)
 		.then( function(book) {return book.update(req.body);})
-		.then( function(book) {
-			if(book){
-				res.redirect('/');
-			} else {
-				res.render('page-not-found');
-			}})
+		.then( function(book) {res.redirect('/');})
 		.catch( function(err) {
 			var book = Book.build(req.body);
 			book.id = req.params.id;
@@ -59,12 +49,8 @@ router.post('/books/:id', (req, res) => {
 router.post('/books/:id/delete', asyncHandler(async(req, res) => {
 	const book = await Book.findByPk(req.params.id);
 
-	if(book) {
-		await book.destroy();
-		res.redirect('/');
-	} else {
-		res.render('page-not-found');
-	}
+	await book.destroy();
+	res.redirect('/');
 }));
 
 router.get('/books', (req, res) => {
